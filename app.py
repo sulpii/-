@@ -2,20 +2,32 @@ import base64
 import streamlit as st
 from config import get_openai_client
 
-st.set_page_config(page_title="맞춤형 시험 문제 생성기", layout="centered")
-st.title("📝 맞춤형 시험 문제 생성기")
+st.set_page_config(page_title="2학년 시험 문제 생성기", layout="centered")
+st.title("📝 시험 문제 생성기")
 
 with st.sidebar:
     st.header("⚙️ 설정")
     user_api_key = st.text_input("OpenAI API Key (선택)", type="password", help="Secrets에 키를 등록했다면 비워두셔도 됩니다.")
     model_choice = st.selectbox("모델 선택", ["gpt-4o", "gpt-4o-mini"])
 
-# 1. 과목 및 출처(교재/페이지) 정보 입력
+# 2학년 시험 시간표 기준 과목 리스트
+grade2_subjects = [
+    "확률과 통계",
+    "매체의사소통",
+    "미적분 I",
+    "윤리와 사상",
+    "영어 II",
+    "동아시아 역사 기행",
+    "화법과 언어",
+    "기타 (직접 입력)"
+]
+
+# 1. 과목 및 출처 정보 입력
 st.subheader("1. 과목 및 교재/페이지 입력")
 col_sub, col_publisher = st.columns(2)
 with col_sub:
-    subject = st.selectbox("과목", ["국어", "영어", "수학", "사회 / 한국사", "과학", "기타 / 직업탐구"])
-    if subject == "기타 / 직업탐구":
+    subject = st.selectbox("과목 선택", grade2_subjects)
+    if subject == "기타 (직접 입력)":
         custom_subject = st.text_input("과목명 직접 입력")
         if custom_subject:
             subject = custom_subject
@@ -25,9 +37,9 @@ with col_publisher:
 
 col_page, col_unit = st.columns(2)
 with col_page:
-    page_range = st.text_input("페이지 범위", placeholder="예: p.45 ~ p.52")
+    page_range = st.text_input("페이지 범위", placeholder="예: 46, 48, 49, 51쪽")
 with col_unit:
-    unit_name = st.text_input("단원명 / 작품명 (선택)", placeholder="예: 2-(1) 서정 갈래의 이해, 윤동주 <자화상>")
+    unit_name = st.text_input("단원명 / 작품명 (선택)", placeholder="예: 2-(1) 단원, 핵심 지문 등")
 
 # 2. 보충 텍스트 및 사진 업로드
 st.subheader("2. 시험 범위 보충 내용 & 사진 (선택)")
@@ -58,7 +70,6 @@ if st.button("🚀 예상 문제 생성하기"):
     elif not publisher and not page_range and not text_input and not uploaded_files:
         st.warning("교재 정보, 페이지, 텍스트, 또는 사진 중 최소 하나는 입력하셔야 합니다.")
     else:
-        # 출처 정보 정리
         book_info = []
         if publisher:
             book_info.append(f"교재/출판사: {publisher}")
@@ -70,7 +81,7 @@ if st.button("🚀 예상 문제 생성하기"):
         book_info_str = ", ".join(book_info) if book_info else "미지정"
 
         prompt = f"""
-        너는 한국 학교의 [{subject}] 과목 시험 출제위원이야.
+        너는 한국 고등학교의 [{subject}] 과목 시험 출제위원이야.
         다음 제공된 시험 범위 정보 및 지식을 바탕으로 [{subject}] 과목 시험에 나올 법한 핵심 예상 문제를 출제해 줘.
         
         [시험 범위 정보]
@@ -79,7 +90,7 @@ if st.button("🚀 예상 문제 생성하기"):
         - 보충 입력 텍스트: {text_input if text_input else '없음'}
         
         [출제 조건]
-        - 입력된 교재명과 페이지/단원명에 해당하는 핵심 개념과 핵심 지문을 파악하여 출제할 것.
+        - 입력된 교재명과 페이지(띄엄띄엄 지정된 경우 지정된 페이지 위주) 및 단원명에 해당하는 핵심 개념과 핵심 지문을 파악하여 출제할 것.
         - 문제 개수: {num_questions}개
         - 문제 유형: {', '.join(q_type)}
         - 문제 구성: 각 문제 아래에 [정답]과 [상세 해설]을 함께 작성할 것.
@@ -87,7 +98,6 @@ if st.button("🚀 예상 문제 생성하기"):
 
         user_content = [{"type": "text", "text": prompt}]
 
-        # 업로드된 사진 파일 처리
         if uploaded_files:
             for file in uploaded_files:
                 bytes_data = file.getvalue()
@@ -98,7 +108,7 @@ if st.button("🚀 예상 문제 생성하기"):
                 })
 
         messages = [
-            {"role": "system", "content": f"너는 {subject} 과목 전문 시험 출제위원이야. 입력된 교재와 페이지 범위를 바탕으로 정확한 예상 문제를 만들어 줘."},
+            {"role": "system", "content": f"너는 고등학교 {subject} 과목 전문 시험 출제위원이야. 입력된 교재와 페이지 범위를 바탕으로 정확한 예상 문제를 만들어 줘."},
             {"role": "user", "content": user_content}
         ]
 
