@@ -58,7 +58,7 @@ if uploaded_files:
 st.subheader("3. 문제 출제 옵션")
 col1, col2 = st.columns(2)
 with col1:
-    num_questions = st.number_input("생성할 문제 수", min_value=1, max_value=20, value=5)
+    num_questions = st.number_input("생성할 문제 수", min_value=1, max_value=50, value=5)
 with col2:
     q_type = st.multiselect("문제 유형", ["객관식 (5지선다)", "단답형", "서술형", "빈칸 채우기"], default=["객관식 (5지선다)", "서술형"])
 
