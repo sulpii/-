@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
-st.set_page_config(page_title="2학년 시험 문제 생성기", layout="centered")
+st.set_page_config(page_title="시험 문제 생성기", layout="centered")
 st.title("📝 맞춤형 문제 생성기")
 
 # 1. API 키 설정 (Streamlit Secrets 또는 사용자 직접 입력)
@@ -23,8 +23,9 @@ with st.sidebar:
 
 # 2학년 과목 리스트
 grade2_subjects = [
-    "확률과 통계", "매체의사소통", "미적분 I", "윤리와 사상", "영어 II", "지구시스템과학",
-    "동아시아 역사 기행", "화법과 언어", "기타 (직접 입력)"
+    "확률과 통계", "생물의 유전", "정치", "매체의사소통", "미적분 I",
+    "역학과 에너지", "윤리와 사상", "영어 II", "지구시스템과학",
+    "법과 사회", "동아시아 역사 기행", "화법과 언어", "물질과 에너지", "경제", "기타 (직접 입력)"
 ]
 
 # 과목 및 출처 입력
